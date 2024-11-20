@@ -1,8 +1,11 @@
 # RTWSM - Minecraft
 
-This is an implementation of [Rectilinear Texture Warping for Fast Adaptive Shadow Mapping](https://www.cspaul.com/publications/Rosen.2012.I3D.pdf) in a Minecraft shader.
+This is an in-progress implementation of [Rectilinear Texture Warping for Fast Adaptive Shadow Mapping](https://www.cspaul.com/publications/Rosen.2012.I3D.pdf) in a Minecraft shader.
 
-In the absence of a programmable pipeline, analysis is done in the previous frame and reprojected into the current frame.
+> [!WARNING]
+> This code is a complete mess right now and many things are implemented in absolutely horrible ways. Proceed with caution.
+
+In the absence of a programmable pipeline, analysis is done after the shadow map is rendered and the importance is used on the subsequent frame. As the shadow map remains static most of the time, this is not a large issue.
 
 A 1024x2 image is used for the importance maps themselves. The first row is the x component of the importance map and the second row is the y component. This is so `imageAtomicMax` can be used to efficiently calculate the maximum along each row and column.
 
