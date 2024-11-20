@@ -9,25 +9,37 @@ uniform mat4 gbufferProjection;
 const float sunPathRotation = -40.0;
 const int shadowMapResolution = 2048;
 
-in vec2 texcoord;
-in vec4 glcolor;
-in vec3 shadowViewPos;
-in vec3 glnormal;
+in VertexData {
+  vec2 texcoord;
+  vec4 glcolor;
+  vec3 glnormal;
+  flat bool isDistorted;
+} vIn;
 
 /*
 const int colortex4Format = R32F;
+const int colortex5Format = R32F;
 */
+
+
 
 /* RENDERTARGETS: 0,1 */
 
 layout(location = 0) out vec4 color;
-layout(location = 1) out float importance;
+layout(location = 1) out vec4 normal;
+layout (r32ui) uniform uimage2D colorimg5;
 
 void main() {
-  color = texture(gtexture, texcoord) * glcolor;
-  if(color.a < 0.1){
+  if(!vIn.isDistorted){
+    if(imageAtomicMin(colorimg5, ivec2(gl_FragCoord.xy), floatBitsToUint(gl_FragCoord.z)) == 0){
+      imageStore(colorimg5, ivec2(gl_FragCoord.xy), uvec4(floatBitsToUint(gl_FragCoord.z)));
+
+    } 
     discard;
   }
 
-  importance = 1.0;
+  color = texture(gtexture, vIn.texcoord) * vIn.glcolor;
+  if(color.a < 0.1){
+    discard;
+  }
 }

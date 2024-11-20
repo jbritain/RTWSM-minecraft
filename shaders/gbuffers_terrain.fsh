@@ -3,6 +3,7 @@
 uniform sampler2D lightmap;
 uniform sampler2D gtexture;
 uniform sampler2D shadowtex0;
+uniform sampler2D colortex4;
 
 uniform float alphaTestRef = 0.1;
 
@@ -41,11 +42,18 @@ void main() {
 
 	vec3 shadowPos = getShadowNDCPos(viewPos) * 0.5 + 0.5;
 
+	vec2 warp = vec2(
+		texelFetch(colortex4, ivec2(shadowPos.x * 1024, 0), 0).r,
+		texelFetch(colortex4, ivec2(shadowPos.y * 1024, 1), 0).r
+	);
+
+	shadowPos.xy += warp;
+
 	if(clamp(shadowPos.xy, 0.0, 1.0) != shadowPos.xy){
 		return;
 	}
 
-	float shadow = step(shadowPos.z - 0.00002, texture(shadowtex0, shadowPos.xy).r);
+	float shadow = step(shadowPos.z - 0.002, texture(shadowtex0, shadowPos.xy).r);
 	color.rgb *= shadow * 0.7 + 0.3;
 
 	normal.rgb = glnormal * 0.5 + 0.5;

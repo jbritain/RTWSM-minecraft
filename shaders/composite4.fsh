@@ -6,10 +6,12 @@ in vec2 texcoord;
 
 /* RENDERTARGETS: 4 */
 
-layout(location = 0) out float warping;
+layout(location = 0) out float prefixSum;
 
 void main() {
-  int superCell = int(gl_FragCoord.x) % 8; // he he he ha
+  prefixSum = 0.0;
 
-  int xRelativeToSuperCell = int(gl_FragCoord.x) - (superCell * 8 + 4);
+  for(int i = 0; i < gl_FragCoord.x; i++){
+    prefixSum += texelFetch(colortex4, ivec2(i, gl_FragCoord.y), 0).r;
+  }
 }
